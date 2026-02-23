@@ -6,6 +6,9 @@ import Uppy from "@uppy/core";
 import GoogleDrive from "@uppy/google-drive";
 import Dropbox from "@uppy/dropbox";
 import OneDrive from "@uppy/onedrive";
+import Dashboard from "@uppy/dashboard";
+import "@uppy/core/dist/style.css";
+import "@uppy/dashboard/dist/style.css";
 
 interface CloudStorageUppyProps {
   onFileSelect?: (file: File) => void;
@@ -94,8 +97,39 @@ export function CloudStorageUppy({
 
   const openCloudStorage = () => {
     if (uppyRef.current) {
-      // 使用 companion 直接打开提供商选择
-      window.open('https://companion.uppy.io/connect', '_blank');
+      // 显示 dashboard 模态框
+      setShowDashboard(true);
+      
+      // 延迟添加 dashboard 插件以确保 DOM 已准备就绪
+      setTimeout(() => {
+        if (uppyRef.current) {
+          // @ts-ignore
+          const existingDashboard = uppyRef.current.getPlugin('Dashboard');
+          if (!existingDashboard) {
+            // @ts-ignore
+            uppyRef.current.use(Dashboard, {
+              id: 'Dashboard',
+              trigger: '.uppy-Dashboard-open',
+              theme: "auto",
+              width: "100%",
+              height: 400,
+              note: t(
+                "Select files from Google Drive, Dropbox, or OneDrive. Supports: DOCX, DOC, XLSX, XLS, PPTX, PPT, PDF"
+              ),
+              proudlyDisplayPoweredByUppy: false,
+              showSelectedFiles: true,
+              showRemoveButtonAfterComplete: true,
+              doneButtonHandler: null,
+            });
+          }
+          
+          // 触发 dashboard 打开
+          const openButton = document.querySelector('.uppy-Dashboard-open');
+          if (openButton) {
+            (openButton as HTMLElement).click();
+          }
+        }
+      }, 100);
     }
   };
 
@@ -124,6 +158,9 @@ export function CloudStorageUppy({
         </div>
       </div>
 
+      {/* 隐藏的触发按钮 */}
+      <button className="uppy-Dashboard-open hidden"></button>
+      
       {showDashboard && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
           <div className="bg-background border border-border rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
@@ -138,13 +175,8 @@ export function CloudStorageUppy({
                 </svg>
               </button>
             </div>
-            <div className="p-4">
-              <div className="text-center py-12">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-purple-500 mx-auto mb-4"></div>
-                <p className="text-text-secondary">
-                  {t("Connecting to cloud storage providers...")}
-                </p>
-              </div>
+            <div className="p-4 min-h-[400px]">
+              <div id="uppy-dashboard-container"></div>
             </div>
           </div>
         </div>
