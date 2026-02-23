@@ -11,6 +11,8 @@
   "rNkVS0": "Select files from Google Drive, Dropbox, or OneDrive. Supports: DOCX, DOC, XLSX, XLS, PPTX, PPT, PDF",
   "K+wZ1u": "Cloud Storage Providers",
   "nHo6iM": "Select files directly from your preferred cloud storage service",
+  "vexbZ2": "Cloud Storage Notice",
+  "2txn76": "Recommended to use local file selection as cloud storage services are being improved",
   "/VlHaO": "Select from {provider}",
   "N05nF4": "Cloud Storage Integration",
   "I2vP/d": "Select files from your cloud storage services",
