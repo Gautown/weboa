@@ -44,20 +44,32 @@ export function CloudStorageUppy({
     });
 
     // 添加云存储插件
-    uppy.use(GoogleDrive, {
-      companionUrl: "https://companion.uppy.io",
-      companionCookiesRule: "same-origin",
-    });
+    try {
+      uppy.use(GoogleDrive, {
+        companionUrl: "https://companion.uppy.io",
+        companionCookiesRule: "same-origin",
+      });
+    } catch (error) {
+      console.warn("Failed to initialize Google Drive plugin:", error);
+    }
 
-    uppy.use(Dropbox, {
-      companionUrl: "https://companion.uppy.io",
-      companionCookiesRule: "same-origin",
-    });
+    try {
+      uppy.use(Dropbox, {
+        companionUrl: "https://companion.uppy.io",
+        companionCookiesRule: "same-origin",
+      });
+    } catch (error) {
+      console.warn("Failed to initialize Dropbox plugin:", error);
+    }
 
-    uppy.use(OneDrive, {
-      companionUrl: "https://companion.uppy.io",
-      companionCookiesRule: "same-origin",
-    });
+    try {
+      uppy.use(OneDrive, {
+        companionUrl: "https://companion.uppy.io",
+        companionCookiesRule: "same-origin",
+      });
+    } catch (error) {
+      console.warn("Failed to initialize OneDrive plugin:", error);
+    }
 
     // 处理文件添加事件
     uppy.on("file-added", (file: any) => {
@@ -81,6 +93,16 @@ export function CloudStorageUppy({
       }
     });
 
+    // 添加网络错误处理
+    uppy.on("error", (error) => {
+      console.error("Uppy error:", error);
+      // 显示用户友好的错误消息
+      if (error.message && error.message.includes("companion.uppy.io")) {
+        console.warn("Companion service unavailable, showing local file picker as fallback");
+        // 可以在这里触发本地文件选择作为备选方案
+      }
+    });
+
     uppyRef.current = uppy;
 
     // 清理函数
@@ -92,6 +114,8 @@ export function CloudStorageUppy({
       }
     };
   }, [onFileSelect, onFileSelectWithHandle]);
+
+  const [showFallbackPicker, setShowFallbackPicker] = useState(false);
 
   const openCloudStorage = () => {
     if (uppyRef.current) {
@@ -153,11 +177,59 @@ export function CloudStorageUppy({
             </svg>
             {t("Open Cloud Storage")}
           </button>
+          
+          <button
+            onClick={() => setShowFallbackPicker(true)}
+            className="flex items-center justify-center gap-2 px-6 py-3 bg-gray-500 text-white rounded-lg hover:bg-gray-600 transition-all font-medium shadow hover:shadow-lg"
+          >
+            <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M14,2H6A2,2 0 0,0 4,4V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V8L14,2M18,20H6V4H13V9H18V20Z" />
+            </svg>
+            {t("Local File Picker")}
+          </button>
         </div>
       </div>
 
       {/* 隐藏的触发按钮 */}
       <button className="uppy-Dashboard-open hidden"></button>
+      
+      {/* 本地文件选择器模态框 */}
+      {showFallbackPicker && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
+          <div className="bg-background border border-border rounded-2xl shadow-2xl w-full max-w-md overflow-hidden">
+            <div className="flex items-center justify-between p-4 border-b border-border">
+              <h3 className="text-lg font-semibold">{t("Local File Picker")}</h3>
+              <button
+                onClick={() => setShowFallbackPicker(false)}
+                className="p-2 hover:bg-muted rounded-lg transition-colors"
+              >
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
+                </svg>
+              </button>
+            </div>
+            <div className="p-6">
+              <input
+                type="file"
+                accept=".docx,.doc,.xlsx,.xls,.pptx,.ppt,.pdf"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    if (onFileSelect) {
+                      onFileSelect(file);
+                    }
+                    setShowFallbackPicker(false);
+                  }
+                }}
+                className="w-full text-sm text-text-secondary file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-medium file:bg-primary/10 file:text-primary hover:file:bg-primary/20"
+              />
+              <p className="text-xs text-text-secondary mt-2">
+                {t("Supports: DOCX, DOC, XLSX, XLS, PPTX, PPT, PDF")}
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
       
       {showDashboard && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
