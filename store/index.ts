@@ -44,7 +44,7 @@ export const useAppStore = create<AppState>()(
       server: new EditorServer(),
 
       // Settings Initial State
-      language: LocaleExtend.Auto,
+      language: Locale.ZH_CN,
       theme: "theme-white",
 
       // Settings Actions
