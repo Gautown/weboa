@@ -24,6 +24,8 @@
   "Tencent Cloud COS": "腾讯云 COS",
   "Alibaba Cloud OSS": "阿里云 OSS",
   "OneDrive": "OneDrive",
+  "Tencent Cloud COS integration is being prepared": "腾讯云 COS 集成正在准备中",
+  "Alibaba Cloud OSS integration is being prepared": "阿里云 OSS 集成正在准备中",
   "ysS5xi": "拖放以打开",
   "4UBbxg": "Word, Excel, PowerPoint 及更多",
   "select_files_from_cloud_storage": "从 Google Drive、Dropbox 或 OneDrive 选择文件。支持：DOCX、DOC、XLSX、XLS、PPTX、PPT、PDF",

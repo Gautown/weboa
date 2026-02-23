@@ -113,7 +113,36 @@ export function CloudProviderButtons({
 
     setActiveProvider(provider);
     
-    // 延迟添加 dashboard 插件以确保 DOM 已准备就绪
+    // 为不同提供商使用不同的处理方式
+    if (provider === 'TencentCOS') {
+      // 腾讯云 COS 专用处理
+      openTencentCOS();
+    } else if (provider === 'AliyunOSS') {
+      // 阿里云 OSS 专用处理
+      openAliyunOSS();
+    } else if (provider === 'OneDrive') {
+      // OneDrive 处理（保持原有逻辑）
+      openGenericProvider(provider);
+    }
+  };
+
+  const openTencentCOS = () => {
+    // 腾讯云 COS 专用逻辑
+    console.log("Opening Tencent Cloud COS interface");
+    // 这里可以添加腾讯云 COS 的专门处理逻辑
+    // 比如直接显示文件选择界面或跳转到腾讯云 COS 页面
+    alert(t("Tencent Cloud COS integration is being prepared"));
+  };
+
+  const openAliyunOSS = () => {
+    // 阿里云 OSS 专用逻辑
+    console.log("Opening Alibaba Cloud OSS interface");
+    // 这里可以添加阿里云 OSS 的专门处理逻辑
+    alert(t("Alibaba Cloud OSS integration is being prepared"));
+  };
+
+  const openGenericProvider = (provider: string) => {
+    // 通用提供商处理（如 OneDrive）
     setTimeout(() => {
       if (uppyRef.current) {
         try {
