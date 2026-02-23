@@ -143,12 +143,8 @@ export function OpenView({
   ];
 
   return (
-    <div 
-      className="space-y-10 pointer-events-none select-none"
-      onClick={(e) => e.preventDefault()}
-      onPointerDown={(e) => e.preventDefault()}
-    >
-      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pointer-events-auto">
+    <div className="space-y-10">
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <section>
         {/* File Picker Card for uploading files */}
         <FilePickerCard onFileSelectWithHandle={handleFileSelectWithHandle} />
@@ -201,7 +197,10 @@ export function OpenView({
             <button
               key={i}
               className="flex flex-col gap-2 group text-left focus:outline-none"
-              onClick={() => handleTemplateClick(tpl)}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleTemplateClick(tpl);
+              }}
               disabled={!!loadingTemplate}
             >
               <div
@@ -267,8 +266,11 @@ export function OpenView({
             {recentFiles.map((file) => (
               <div
                 key={file.path}
-                onClick={() => handleRecentFileClick(file)}
-                className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-sidebar-hover border-b border-border last:border-0 transition-colors group"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  handleRecentFileClick(file);
+                }}
+                className="w-full flex items-center justify-between px-5 py-3.5 hover:bg-sidebar-hover border-b border-border last:border-0 transition-colors group cursor-pointer"
                 title={t("Click to reopen this file")}
               >
                 <div className="flex items-center gap-4">
@@ -281,7 +283,10 @@ export function OpenView({
                   </div>
                 </div>
                 <button
-                  onClick={(e) => handleRemoveRecentFile(e, file.path)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleRemoveRecentFile(e, file.path);
+                  }}
                   className="opacity-0 group-hover:opacity-100 transition-opacity p-1 hover:bg-border/50 rounded"
                   title={t("Remove from recent")}
                 >
