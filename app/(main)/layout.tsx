@@ -1,0 +1,133 @@
+"use client";
+
+import { useCallback, useEffect } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import { useExtracted } from "next-intl";
+import { Header } from "@/components/header";
+import { Sidebar } from "@/components/sidebar";
+import { DragDropOverlay } from "@/components/drag-drop-overlay";
+import { useAppStore } from "@/store";
+import { addRecentFile } from "@/utils/recent-files";
+import { cn } from "@/lib/utils";
+import { MobileNav } from "@/components/mobile-nav";
+import { isDarkTheme } from "@/utils/utils";
+
+export default function MainLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const t = useExtracted();
+  const { server, theme } = useAppStore();
+
+  useEffect(() => {
+    const isDark = isDarkTheme(theme);
+    if (isDark) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [theme]);
+
+  const handleFileSelect = useCallback(
+    async (file: File, handle?: FileSystemFileHandle) => {
+      if (handle) {
+        try {
+          await addRecentFile(handle);
+        } catch (err) {
+          console.error("Failed to save dropped file to recent:", err);
+        }
+      }
+      const { id } = await server.open(file);
+      router.push(`/editor`);
+    },
+    [router, server],
+  );
+
+  const getNewUrl = (type: string) => `/editor?new=${type}`;
+
+  return (
+    <div
+      className={cn(
+        "flex flex-col h-screen overflow-hidden font-sans transition-colors duration-500 relative",
+        "bg-muted text-slate-900 dark:bg-[#0b0b0b] dark:text-white",
+      )}
+    >
+      {/* Background Decorative Elements for Dark Mode */}
+      <div className="hidden dark:block absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <div className="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] bg-primary/8 rounded-full blur-[120px]"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] bg-primary/6 rounded-full blur-[100px]"></div>
+        <div className="absolute top-[20%] right-[10%] w-[30%] h-[30%] bg-primary/3 rounded-full blur-[100px]"></div>
+      </div>
+
+      <Header>
+        <a
+          href="https://www.producthunt.com/products/serverless-web-office-by-ziziyi?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-serverless-web-office-by-ziziyi"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="hidden md:flex items-center hover:opacity-90 transition-opacity ms-auto me-4"
+        >
+          <img
+            alt="Serverless Web Office by ZIZIYI - Serverless Web Office: Private, In-Browser editing via WASM. | Product Hunt"
+            src={`https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1067951&theme=${
+              isDarkTheme(theme) ? "dark" : "light"
+            }&t=1769359248898`}
+            className="h-[42px] w-auto"
+          />
+        </a>
+      </Header>
+      <div className="flex flex-1 overflow-hidden flex-col md:flex-row relative z-10">
+        <div className="hidden md:flex">
+          <Sidebar pathname={pathname} getNewUrl={getNewUrl} />
+        </div>
+
+        {/* Main Content Area as a Card */}
+        <main
+          className={cn(
+            "flex-1 md:mb-3 rounded-none md:rounded-2xl overflow-hidden flex flex-col transition-colors duration-500 shadow-none md:shadow-xl relative",
+            "backdrop-blur-3xl bg-white dark:bg-[#141414]/60  dark:md:border dark:md:border-white/10",
+          )}
+        >
+          <div className="flex-1 overflow-y-auto custom-scrollbar">
+            <div className="p-4 md:p-8 max-w-6xl mx-auto w-full pb-24 md:pb-8">
+              {children}
+            </div>
+          </div>
+        </main>
+        <div className="hidden md:block w-3"></div>
+      </div>
+
+      <div className="md:hidden fixed bottom-0 left-0 right-0 z-50">
+        <MobileNav pathname={pathname} />
+      </div>
+
+      {/* Global Drag and Drop Overlay */}
+      <DragDropOverlay onFileDrop={handleFileSelect} />
+
+      <style jsx global>{`
+        .scrollbar-hide::-webkit-scrollbar {
+          display: none;
+        }
+        .scrollbar-hide {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+          width: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+          background: transparent;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+          background: var(--border);
+          border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+          background: var(--text-secondary);
+        }
+      `}</style>
+    </div>
+  );
+}
