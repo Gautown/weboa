@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "office-website",
+  "name": "oa",
   "compatibility_date": "2026-01-12",
    "assets": {
     "directory": "./out"
