@@ -114,15 +114,23 @@ export function CloudProviderButtons({
   }, [onFileSelect, onFileSelectWithHandle]);
 
   const openProvider = (provider: string) => {
-    if (uppyRef.current) {
-      setActiveProvider(provider);
-      
-      // 延迟添加 dashboard 插件以确保 DOM 已准备就绪
-      setTimeout(() => {
-        if (uppyRef.current) {
+    console.log(`Opening provider: ${provider}`);
+    
+    if (!uppyRef.current) {
+      console.error("Uppy instance not initialized");
+      return;
+    }
+
+    setActiveProvider(provider);
+    
+    // 延迟添加 dashboard 插件以确保 DOM 已准备就绪
+    setTimeout(() => {
+      if (uppyRef.current) {
+        try {
           // @ts-ignore
           const existingDashboard = uppyRef.current.getPlugin('Dashboard');
           if (!existingDashboard) {
+            console.log("Initializing Dashboard plugin");
             // @ts-ignore
             uppyRef.current.use(Dashboard, {
               id: 'Dashboard',
@@ -142,20 +150,28 @@ export function CloudProviderButtons({
           
           // 根据提供商打开对应的界面
           setTimeout(() => {
+            console.log(`Attempting to open ${provider} interface`);
             const providerButton = document.querySelector(`[data-uppy-provider="${provider}"]`);
             if (providerButton) {
+              console.log(`Found provider button for ${provider}`);
               (providerButton as HTMLElement).click();
             } else {
+              console.log(`Provider button not found, trying generic open button`);
               // 如果找不到特定提供商按钮，触发通用打开按钮
               const openButton = document.querySelector('.uppy-Dashboard-open');
               if (openButton) {
+                console.log("Triggering generic dashboard open");
                 (openButton as HTMLElement).click();
+              } else {
+                console.error("No open button found");
               }
             }
           }, 100);
+        } catch (error) {
+          console.error(`Error opening ${provider}:`, error);
         }
-      }, 100);
-    }
+      }
+    }, 100);
   };
 
   return (
