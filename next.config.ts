@@ -17,7 +17,7 @@ const withNextIntl = createNextIntlPlugin({
 
 const nextConfig: NextConfig = {
   /* config options here */
-  // output: "export", // 暂时禁用导出模式以解决 Turbopack 兼容性问题
+  output: "export",
   
   // 禁用源映射以解决 SWC 错误
   productionBrowserSourceMaps: false,
