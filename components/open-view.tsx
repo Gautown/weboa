@@ -143,7 +143,11 @@ export function OpenView({
   ];
 
   return (
-    <div className="space-y-10 pointer-events-none">
+    <div 
+      className="space-y-10 pointer-events-none select-none"
+      onClick={(e) => e.preventDefault()}
+      onPointerDown={(e) => e.preventDefault()}
+    >
       <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 pointer-events-auto">
       <section>
         {/* File Picker Card for uploading files */}
