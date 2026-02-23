@@ -1,8 +1,9 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "oa",
+  "main": "worker.js",
   "compatibility_date": "2026-01-12",
-   "assets": {
+  "assets": {
     "directory": "out"
   }
 }

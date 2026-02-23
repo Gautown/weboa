@@ -9,8 +9,8 @@
     "lint": "eslint",
     "svgr": "npx @svgr/cli --out-dir components/svg --typescript -- public/svg",
     "pages:dev": "npx wrangler pages dev ./out",
-    "deploy": "pnpm build && npx wrangler pages deploy out --project-name=office-website",
-    "deploy:preview": "pnpm build && npx wrangler pages deploy out --project-name=office-website --branch=preview"
+    "deploy": "pnpm build && npx wrangler deploy",
+    "deploy:preview": "pnpm build && npx wrangler deploy --env preview"
   },
   "dependencies": {
     "@radix-ui/react-popover": "^1.1.15",
