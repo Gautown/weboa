@@ -172,20 +172,7 @@ export function CloudProviderButtons({
           {t("Select files directly from your preferred cloud storage service")}
         </p>
         
-        {/* 说明信息 */}
-        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg p-4 mb-4">
-          <div className="flex items-start gap-3">
-            <div className="w-5 h-5 text-blue-600 dark:text-blue-400 mt-0.5">ℹ️</div>
-            <div>
-              <h4 className="font-medium text-blue-800 dark:text-blue-200 mb-1">
-                {t("Cloud Storage Notice")}
-              </h4>
-              <p className="text-sm text-blue-700 dark:text-blue-300">
-                {t("Recommended to use local file selection as cloud storage services are being improved")}
-              </p>
-            </div>
-          </div>
-        </div>
+
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* 腾讯云 COS Button */}
