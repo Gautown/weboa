@@ -121,8 +121,8 @@ export function CloudProviderButtons({
       // 阿里云 OSS 专用处理
       openAliyunOSS();
     } else if (provider === 'OneDrive') {
-      // OneDrive 处理（保持原有逻辑）
-      openGenericProvider(provider);
+      // OneDrive 专用处理
+      openOneDrive();
     }
   };
 
@@ -139,6 +139,13 @@ export function CloudProviderButtons({
     console.log("Opening Alibaba Cloud OSS interface");
     // 这里可以添加阿里云 OSS 的专门处理逻辑
     alert(t("Alibaba Cloud OSS integration is being prepared"));
+  };
+
+  const openOneDrive = () => {
+    // OneDrive 专用逻辑
+    console.log("Opening OneDrive interface");
+    // 这里可以添加 OneDrive 的专门处理逻辑
+    alert(t("OneDrive integration is being prepared"));
   };
 
   const openGenericProvider = (provider: string) => {
