@@ -45,7 +45,7 @@
 - **⚡ 快速且响应迅速**: 基于 Next.js 15+ 构建，并针对性能进行了优化。
 - **🛠️ 丰富工具**: 集成了先进的编辑功能。
 - **📦 持久化存储**: 使用 IndexedDB 进行本地文件管理。
-- **🌐 云端集成**: 通过 Uppy 轻松选择文件（支持 Google Drive、Dropbox、OneDrive）。
+- **🌐 云端集成**: 通过 Uppy 轻松选择文件，支持 Google Drive、Dropbox 和 OneDrive。
 
 ## 🛠️ 技术栈
 

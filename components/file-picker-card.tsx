@@ -1,8 +1,9 @@
 "use client";
 
-import { Upload, FileText, FolderOpen, Download } from "lucide-react";
+import { Upload, FileText, FolderOpen, Download, Cloud } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { useExtracted } from "next-intl";
+import { CloudStorageModal } from "@/components/cloud-storage-modal";
 
 interface FilePickerCardProps {
   onFileSelect?: (file: File) => void;
@@ -19,6 +20,7 @@ export function FilePickerCard({
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isDragOver, setIsDragOver] = useState(false);
   const [supportsFileSystemAPI, setSupportsFileSystemAPI] = useState(false);
+  const [showCloudModal, setShowCloudModal] = useState(false);
 
   // Check if File System Access API is supported
   useEffect(() => {
@@ -251,6 +253,21 @@ export function FilePickerCard({
             {t("Supports: DOCX, DOC, XLSX, XLS, PPTX, PPT, PDF")}
           </p>
 
+          {/* Cloud Storage Integration Button */}
+          <div className="mt-4">
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                setShowCloudModal(true);
+              }}
+              className="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-lg hover:from-purple-600 hover:to-blue-600 transition-all font-medium shadow-lg hover:shadow-xl"
+            >
+              <Cloud className="w-5 h-5" />
+              {t("Cloud Storage Integration")}
+            </button>
+          </div>
+
           {/* Quick access buttons for File System Access API */}
           {supportsFileSystemAPI && false && (
             <div className="flex items-center justify-center gap-3">
@@ -299,6 +316,14 @@ export function FilePickerCard({
           )}
         </div>
       </div>
+
+      {/* Cloud Storage Modal */}
+      <CloudStorageModal
+        isOpen={showCloudModal}
+        onClose={() => setShowCloudModal(false)}
+        onFileSelect={onFileSelect}
+        onFileSelectWithHandle={onFileSelectWithHandle}
+      />
     </>
   );
 }

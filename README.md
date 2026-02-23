@@ -45,7 +45,7 @@
 - **⚡ Fast & Responsive**: Built with Next.js 15+ and optimized for performance.
 - **🛠️ Rich Tools**: Integrated with advanced editing capabilities.
 - **📦 Persistent Storage**: Uses IndexedDB for local file management.
-- **🌐 Cloud Integration**: Easy file selection via Uppy (Google Drive, Dropbox, OneDrive).
+- **🌐 Cloud Integration**: Easy file selection via Uppy with Google Drive, Dropbox, and OneDrive support.
 
 ## 🛠️ Technology Stack
 
