@@ -10,7 +10,9 @@ import Compressor from "@uppy/compressor";
 import OneDrive from "@uppy/onedrive";
 import Dashboard from "@uppy/dashboard";
 import COS from "cos-js-sdk-v5";
+import OSS from "ali-oss";
 import { cosConfig, allowedFileTypes, uploadConfig } from "@/config/cos.config";
+import { aliyunOSSConfig, aliyunAllowedFileTypes, aliyunUploadConfig } from "@/config/aliyun-oss.config";
 
 interface CloudProviderButtonsProps {
   onFileSelect?: (file: File) => void;
@@ -65,6 +67,9 @@ export function CloudProviderButtons({
   // 腾讯云 COS 客户端
   const [cosClient, setCosClient] = useState<COS | null>(null);
   
+  // 阿里云 OSS 客户端
+  const [ossClient, setOssClient] = useState<OSS | null>(null);
+  
   // 使用导入的配置
 
   useEffect(() => {
@@ -79,7 +84,19 @@ export function CloudProviderButtons({
       }
     };
     
+    // 初始化阿里云 OSS 客户端
+    const initOSS = () => {
+      try {
+        const client = new OSS(aliyunOSSConfig);
+        setOssClient(client);
+        console.log('阿里云 OSS 客户端初始化成功');
+      } catch (error) {
+        console.error('阿里云 OSS 客户端初始化失败:', error);
+      }
+    };
+    
     initCOS();
+    initOSS();
     
     // 初始化 Uppy 实例
     const uppy = new Uppy({
@@ -550,21 +567,53 @@ export function CloudProviderButtons({
     alert('实际应用中会跳转到阿里云 OAuth 授权页面');
   };
 
-  const handleAliyunOSSDemoLogin = () => {
+  const handleAliyunOSSDemoLogin = async () => {
     setIsAliyunAuthenticated(true);
     setAliyunUserInfo({
       name: '阿里云用户',
       avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=阿里云用户'
     });
     
-    setAliyunOSSFiles([
-      { name: '数据分析报告.xlsx', size: 4096000, modified: new Date(Date.now() - 86400000), key: 'reports/数据分析报告.xlsx' },
-      { name: '市场调研.pptx', size: 2048000, modified: new Date(Date.now() - 172800000), key: 'presentations/市场调研.pptx' },
-      { name: '技术文档.docx', size: 1536000, modified: new Date(Date.now() - 259200000), key: 'docs/技术文档.docx' },
-      { name: '用户手册.pdf', size: 3072000, modified: new Date(Date.now() - 345600000), key: 'manuals/用户手册.pdf' },
-    ]);
-    
-    console.log('阿里云演示登录成功');
+    try {
+      if (ossClient) {
+        // 获取真实的文件列表
+        const result = await ossClient.list({
+          'max-keys': 100,
+          prefix: ''
+        });
+        
+        console.log('阿里云 OSS 文件列表:', result);
+        
+        // 处理返回的文件数据
+        const files = result.objects?.map((obj: any) => ({
+          name: obj.name.split('/').pop() || obj.name,
+          size: obj.size,
+          modified: new Date(obj.lastModified),
+          key: obj.name
+        })) || [];
+        
+        setAliyunOSSFiles(files);
+        console.log('阿里云真实文件加载成功');
+      } else {
+        // 如果客户端未初始化，使用示例文件
+        setAliyunOSSFiles([
+          { name: '数据分析报告.xlsx', size: 4096000, modified: new Date(Date.now() - 86400000), key: 'reports/数据分析报告.xlsx' },
+          { name: '市场调研.pptx', size: 2048000, modified: new Date(Date.now() - 172800000), key: 'presentations/市场调研.pptx' },
+          { name: '技术文档.docx', size: 1536000, modified: new Date(Date.now() - 259200000), key: 'docs/技术文档.docx' },
+          { name: '用户手册.pdf', size: 3072000, modified: new Date(Date.now() - 345600000), key: 'manuals/用户手册.pdf' },
+        ]);
+        console.log('阿里云使用示例文件');
+      }
+    } catch (error) {
+      console.error('获取阿里云 OSS 文件列表失败:', error);
+      // 出错时使用示例文件
+      setAliyunOSSFiles([
+        { name: '数据分析报告.xlsx', size: 4096000, modified: new Date(Date.now() - 86400000), key: 'reports/数据分析报告.xlsx' },
+        { name: '市场调研.pptx', size: 2048000, modified: new Date(Date.now() - 172800000), key: 'presentations/市场调研.pptx' },
+        { name: '技术文档.docx', size: 1536000, modified: new Date(Date.now() - 259200000), key: 'docs/技术文档.docx' },
+        { name: '用户手册.pdf', size: 3072000, modified: new Date(Date.now() - 345600000), key: 'manuals/用户手册.pdf' },
+      ]);
+    }
   };
 
   const handleAliyunOSSLogout = () => {
@@ -573,6 +622,121 @@ export function CloudProviderButtons({
     setAliyunOSSFiles([]);
     setSelectedAliyunOSSFile(null);
     console.log('已退出阿里云 OSS');
+  };
+
+  const handleAliyunOSSUpload = async () => {
+    if (!ossClient) {
+      alert('OSS 客户端未初始化');
+      return;
+    }
+    
+    const input = document.createElement('input');
+    input.type = 'file';
+    input.accept = aliyunAllowedFileTypes.join(',');
+    input.onchange = async (e) => {
+      const file = (e.target as HTMLInputElement).files?.[0];
+      if (file) {
+        try {
+          setIsLoading(true);
+          console.log('开始上传文件到阿里云 OSS:', file.name);
+          
+          // 上传文件到 OSS
+          const result = await ossClient.put(`uploads/${file.name}`, file, {
+            headers: {
+              'Content-Type': file.type || 'application/octet-stream'
+            }
+          });
+          
+          console.log('文件上传成功:', result);
+          alert(`文件 ${file.name} 上传成功！`);
+          
+          // 刷新文件列表
+          await handleAliyunOSSDemoLogin();
+          
+        } catch (error) {
+          console.error('文件上传失败:', error);
+          alert(`文件上传失败: ${(error as Error).message}`);
+        } finally {
+          setIsLoading(false);
+        }
+      }
+    };
+    input.click();
+  };
+
+  const handleAliyunOSSDownload = async () => {
+    if (!ossClient || !selectedAliyunOSSFile) {
+      alert('请选择要下载的文件');
+      return;
+    }
+    
+    try {
+      setIsLoading(true);
+      console.log('开始下载文件:', selectedAliyunOSSFile);
+      
+      // 找到选中的文件信息
+      const selectedFile = aliyunOSSFiles.find(f => f.name === selectedAliyunOSSFile);
+      if (!selectedFile) {
+        throw new Error('未找到选中的文件');
+      }
+      
+      // 生成临时下载链接
+      const url = ossClient.signatureUrl(selectedFile.key, {
+        method: 'GET',
+        expires: 3600 // 1小时有效期
+      });
+      
+      // 创建临时链接并触发下载
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = selectedFile.name;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      console.log('文件下载完成:', selectedFile.name);
+      alert(`文件 ${selectedFile.name} 开始下载`);
+      
+    } catch (error) {
+      console.error('文件下载失败:', error);
+      alert(`文件下载失败: ${(error as Error).message}`);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleAliyunOSSRefresh = async () => {
+    await handleAliyunOSSDemoLogin();
+  };
+
+  const handleAliyunOSSDelete = async (fileName: string) => {
+    if (!ossClient) {
+      alert('OSS 客户端未初始化');
+      return;
+    }
+    
+    if (!confirm(`确定要删除文件 "${fileName}" 吗？`)) {
+      return;
+    }
+    
+    try {
+      setIsLoading(true);
+      const file = aliyunOSSFiles.find(f => f.name === fileName);
+      if (file) {
+        await ossClient.delete(file.key);
+        console.log('文件删除成功:', fileName);
+        alert(`文件 ${fileName} 删除成功`);
+        
+        // 刷新文件列表
+        await handleAliyunOSSDemoLogin();
+      }
+    } catch (error) {
+      console.error('文件删除失败:', error);
+      alert(`文件删除失败: ${(error as Error).message}`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleAliyunOSSDownload = () => {
@@ -975,13 +1139,25 @@ export function CloudProviderButtons({
                   </div>
                 )}
               </div>
-              <button
-                onClick={handleAliyunOSSLogout}
-                className="p-2 hover:bg-muted rounded-lg transition-colors text-sm text-red-500"
-                title="退出登录"
-              >
-                退出
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={handleAliyunOSSRefresh}
+                  className="p-2 hover:bg-muted rounded-lg transition-colors"
+                  title="刷新"
+                  disabled={isLoading}
+                >
+                  <svg className={`w-5 h-5 ${isLoading ? 'animate-spin' : ''}`} viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
+                  </svg>
+                </button>
+                <button
+                  onClick={handleAliyunOSSLogout}
+                  className="p-2 hover:bg-muted rounded-lg transition-colors text-sm text-red-500"
+                  title="退出登录"
+                >
+                  退出
+                </button>
+              </div>
             </div>
             
             <div className="flex-1 overflow-auto">
