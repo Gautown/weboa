@@ -233,7 +233,7 @@ export function CloudProviderButtons({
                 />
               </svg>
             </div>
-            <span className="font-medium text-teal-700">OneDrive</span>
+            <span className="font-medium text-teal-700">{t("OneDrive")}</span>
           </button>
         </div>
       </div>
