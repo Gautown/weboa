@@ -33,14 +33,11 @@ export function CloudProviderButtons({
     size: number;
     modified: Date;
     key: string;
-  }>>([
-    { name: 'example.docx', size: 1024000, modified: new Date(), key: 'doc/example.docx' },
-    { name: 'report.xlsx', size: 2048000, modified: new Date(), key: 'excel/report.xlsx' },
-    { name: 'presentation.pptx', size: 512000, modified: new Date(), key: 'ppt/presentation.pptx' },
-    { name: 'document.pdf', size: 1536000, modified: new Date(), key: 'pdf/document.pdf' },
-  ]);
+  }>>([]);
   const [selectedTencentCOSFile, setSelectedTencentCOSFile] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userInfo, setUserInfo] = useState<{name: string, avatar: string} | null>(null);
   
   // 阿里云 OSS 相关状态
   const [aliyunOSSFiles, setAliyunOSSFiles] = useState<Array<{
@@ -48,11 +45,10 @@ export function CloudProviderButtons({
     size: number;
     modified: Date;
     key: string;
-  }>>([
-    { name: 'data.xlsx', size: 3072000, modified: new Date(), key: 'data/data.xlsx' },
-    { name: 'chart.pptx', size: 768000, modified: new Date(), key: 'charts/chart.pptx' },
-  ]);
+  }>>([]);
   const [selectedAliyunOSSFile, setSelectedAliyunOSSFile] = useState<string | null>(null);
+  const [isAliyunAuthenticated, setIsAliyunAuthenticated] = useState(false);
+  const [aliyunUserInfo, setAliyunUserInfo] = useState<{name: string, avatar: string} | null>(null);
   
   // OneDrive 相关状态
   const [oneDriveFiles, setOneDriveFiles] = useState<Array<{
@@ -303,6 +299,108 @@ export function CloudProviderButtons({
       }
     };
     input.click();
+  };
+
+  // 腾讯云 COS 登录相关函数
+  const renderTencentCOSLogin = () => {
+    return (
+      <div className="flex flex-col items-center justify-center h-full text-center p-8">
+        <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mb-6">
+          <svg className="w-8 h-8 text-white" viewBox="0 0 24 24">
+            <path
+              fill="currentColor"
+              d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+            />
+          </svg>
+        </div>
+        <h3 className="text-2xl font-bold mb-2">腾讯云 COS</h3>
+        <p className="text-text-secondary mb-8 max-w-md">
+          请登录您的腾讯云账号以访问 COS 对象存储服务中的文件
+        </p>
+        
+        <div className="bg-muted/50 rounded-xl p-6 w-full max-w-md mb-6">
+          <h4 className="font-semibold mb-4 text-left">登录方式</h4>
+          <div className="space-y-3">
+            <button
+              onClick={handleTencentCOSLogin}
+              className="w-full flex items-center gap-3 p-3 bg-blue-500 hover:bg-blue-600 text-white rounded-lg transition-colors"
+            >
+              <div className="w-8 h-8 bg-white rounded flex items-center justify-center">
+                <svg className="w-5 h-5 text-blue-500" viewBox="0 0 24 24">
+                  <path fill="currentColor" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                  <path fill="currentColor" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                  <path fill="currentColor" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                  <path fill="currentColor" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+              </div>
+              <span className="font-medium">使用腾讯云账号登录</span>
+            </button>
+            
+            <div className="relative my-4">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-border"></div>
+              </div>
+              <div className="relative flex justify-center text-xs">
+                <span className="bg-background px-2 text-text-secondary">或</span>
+              </div>
+            </div>
+            
+            <button
+              onClick={handleTencentCOSDemoLogin}
+              className="w-full p-3 border border-border rounded-lg hover:bg-muted transition-colors font-medium"
+            >
+              演示模式（查看示例文件）
+            </button>
+          </div>
+        </div>
+        
+        <div className="text-sm text-text-secondary max-w-md">
+          <p className="mb-2">🔒 安全提示：</p>
+          <ul className="text-left space-y-1 text-xs">
+            <li>• 我们不会保存您的账号密码</li>
+            <li>• 使用 OAuth 2.0 安全授权</li>
+            <li>• 仅获取必要的文件访问权限</li>
+          </ul>
+        </div>
+      </div>
+    );
+  };
+
+  const handleTencentCOSLogin = () => {
+    // 实际的登录逻辑应该跳转到腾讯云 OAuth 授权页面
+    console.log('开始腾讯云 COS 登录流程');
+    alert('实际应用中会跳转到腾讯云 OAuth 授权页面');
+    
+    // 模拟登录成功
+    // handleTencentCOSDemoLogin();
+  };
+
+  const handleTencentCOSDemoLogin = () => {
+    // 演示模式 - 使用示例文件
+    setIsAuthenticated(true);
+    setUserInfo({
+      name: '演示用户',
+      avatar: 'https://api.dicebear.com/7.x/initials/svg?seed=演示用户'
+    });
+    
+    // 设置示例文件
+    setTencentCOSFiles([
+      { name: '项目计划书.docx', size: 2048000, modified: new Date(Date.now() - 86400000), key: 'documents/项目计划书.docx' },
+      { name: '销售数据.xlsx', size: 3072000, modified: new Date(Date.now() - 172800000), key: 'data/销售数据.xlsx' },
+      { name: '产品介绍.pptx', size: 1536000, modified: new Date(Date.now() - 259200000), key: 'presentations/产品介绍.pptx' },
+      { name: '合同模板.pdf', size: 1024000, modified: new Date(Date.now() - 345600000), key: 'templates/合同模板.pdf' },
+      { name: '会议纪要.docx', size: 512000, modified: new Date(Date.now() - 432000000), key: 'meetings/会议纪要.docx' },
+    ]);
+    
+    console.log('演示登录成功');
+  };
+
+  const handleTencentCOSLogout = () => {
+    setIsAuthenticated(false);
+    setUserInfo(null);
+    setTencentCOSFiles([]);
+    setSelectedTencentCOSFile(null);
+    console.log('已退出腾讯云 COS');
   };
 
   const handleTencentCOSDownload = async () => {
@@ -584,6 +682,9 @@ export function CloudProviderButtons({
   const renderProviderContent = (provider: string) => {
     switch (provider) {
       case 'TencentCOS':
+        if (!isAuthenticated) {
+          return renderTencentCOSLogin();
+        }
         return (
           <div className="flex flex-col h-full">
             <div className="flex items-center justify-between mb-4 pb-2 border-b border-border">
@@ -600,15 +701,24 @@ export function CloudProviderButtons({
                   <h4 className="text-lg font-semibold">腾讯云 COS</h4>
                   <p className="text-sm text-text-secondary">对象存储服务</p>
                 </div>
+                {userInfo && (
+                  <div className="flex items-center gap-2 ml-auto">
+                    <img 
+                      src={userInfo.avatar} 
+                      alt="用户头像" 
+                      className="w-8 h-8 rounded-full"
+                      onError={(e) => (e.currentTarget.src = '/default-avatar.png')}
+                    />
+                    <span className="text-sm">{userInfo.name}</span>
+                  </div>
+                )}
               </div>
               <button
-                onClick={() => refreshTencentCOS()}
-                className="p-2 hover:bg-muted rounded-lg transition-colors"
-                title="刷新"
+                onClick={handleTencentCOSLogout}
+                className="p-2 hover:bg-muted rounded-lg transition-colors text-sm text-red-500"
+                title="退出登录"
               >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
-                </svg>
+                退出
               </button>
             </div>
             
