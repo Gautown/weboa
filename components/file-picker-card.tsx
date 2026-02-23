@@ -254,20 +254,6 @@ export function FilePickerCard({
             {t("Supports: DOCX, DOC, XLSX, XLS, PPTX, PPT, PDF")}
           </p>
 
-          {/* Cloud Storage Section */}
-          <div className="mt-6 pt-4 border-t border-border">
-            <h4 className="text-md font-semibold mb-3 text-foreground flex items-center gap-2">
-              <Cloud className="w-4 h-4 text-primary" />
-              {t("Cloud Storage Integration")}
-            </h4>
-            
-            {/* Direct Provider Buttons */}
-            <CloudProviderButtons 
-              onFileSelect={onFileSelect}
-              onFileSelectWithHandle={onFileSelectWithHandle}
-            />
-          </div>
-
           {/* Quick access buttons for File System Access API */}
           {supportsFileSystemAPI && false && (
             <div className="flex items-center justify-center gap-3">
@@ -315,6 +301,23 @@ export function FilePickerCard({
             </div>
           )}
         </div>
+      </div>
+
+      {/* Cloud Storage Integration -独立容器 */}
+      <div className="mt-6 p-6 bg-muted/40 dark:bg-white/5 border border-border rounded-2xl">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-8 h-8 bg-gradient-to-r from-purple-500 to-blue-500 rounded-lg flex items-center justify-center">
+            <Cloud className="w-4 h-4 text-white" />
+          </div>
+          <h3 className="text-lg font-semibold text-foreground">
+            {t("Cloud Storage Integration")}
+          </h3>
+        </div>
+        
+        <CloudProviderButtons 
+          onFileSelect={onFileSelect}
+          onFileSelectWithHandle={onFileSelectWithHandle}
+        />
       </div>
 
       {/* Cloud Storage Modal */}
