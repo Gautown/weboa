@@ -17,6 +17,12 @@ importers:
       '@radix-ui/react-tooltip':
         specifier: ^1.2.8
         version: 1.2.8(@types/react-dom@19.2.3(@types/react@19.2.7))(@types/react@19.2.7)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@uppy/aws-s3':
+        specifier: ^5.1.0
+        version: 5.1.0(@uppy/core@5.2.0)
+      '@uppy/compressor':
+        specifier: ^3.1.0
+        version: 3.1.0(@uppy/core@5.2.0)
       '@uppy/core':
         specifier: ^5.2.0
         version: 5.2.0
@@ -38,6 +44,9 @@ importers:
       '@uppy/react':
         specifier: ^5.1.1
         version: 5.1.1(@uppy/core@5.2.0)(@uppy/dashboard@5.1.0(@uppy/core@5.2.0))(react-dom@19.2.3(react@19.2.3))(react@19.2.3)
+      '@uppy/thumbnail-generator':
+        specifier: ^5.1.0
+        version: 5.1.0(@uppy/core@5.2.0)
       '@ziziyi/utils':
         specifier: ^1.0.2
         version: 1.0.2
@@ -1268,6 +1277,11 @@ packages:
     cpu: [x64]
     os: [win32]
 
+  '@uppy/aws-s3@5.1.0':
+    resolution: {integrity: sha512-UBz+shrtDbnOf11AboDrkc9Fq2Cdf8HbFftE+gqfxig6fkv5rHpHhBCLkl8wCGAq+X/CxdqvvNhm/OM23Uzw2w==}
+    peerDependencies:
+      '@uppy/core': ^5.2.0
+
   '@uppy/companion-client@5.1.1':
     resolution: {integrity: sha512-DzrOWTbIZHvtgAFXBMYHk2wD27NjpBSVhY2tEiEIUhPd2CxbFRZjHM/N3HOt3VwZEAP471QWFLlJRWPcIY3A2Q==}
     peerDependencies:
@@ -1287,6 +1301,11 @@ packages:
         optional: true
       '@uppy/webcam':
         optional: true
+
+  '@uppy/compressor@3.1.0':
+    resolution: {integrity: sha512-EPCU1j/hvey05/ePPzuqaF7p4fORsc3PNvRGDXrT5fiZv0FCAufY5GZf4OUAiKNHkL59wwxAgMySOTJq7WBZtA==}
+    peerDependencies:
+      '@uppy/core': ^5.2.0
 
   '@uppy/core@5.2.0':
     resolution: {integrity: sha512-uvfNyz4cnaplt7LYJmEZHuqOuav0tKp4a9WKJIaH6iIj7XiqYvS2J5SEByexAlUFlzefOAyjzj4Ja2dd/8aMrw==}
@@ -1446,6 +1465,9 @@ packages:
     resolution: {integrity: sha512-Sg0xJUNDU1sJNGdfGWhVHX0kkZ+HWcvmVymJbj6NSgZZmW/8S9Y2HQ5euytnIgakgxN6papOAWiwDo1ctFDcoQ==}
     hasBin: true
 
+  blueimp-canvas-to-blob@3.29.0:
+    resolution: {integrity: sha512-0pcSSGxC0QxT+yVkivxIqW0Y4VlO2XSDPofBAqoJ1qJxgH9eiUDLv50Rixij2cDuEfx4M6DpD9UGZpRhT5Q8qg==}
+
   brace-expansion@1.1.12:
     resolution: {integrity: sha512-9T9UjW3r0UW5c1Q7GTwllptXwhvYmEzFhzMfZ9H7FQWt+uZePjZPjBP/W1ZEyZ1twGWom5/56TF4lPcqjnDHcg==}
 
@@ -1503,6 +1525,9 @@ packages:
 
   color-name@1.1.4:
     resolution: {integrity: sha512-dOy+3AuW3a2wNbZHIuMZpTcgjGuLU/uBL/ubcZF9OXbDo8ff4O8yVp5Bf0efS8uEoYo5q4Fx7dY9OgQGXgAsQA==}
+
+  compressorjs@1.2.1:
+    resolution: {integrity: sha512-+geIjeRnPhQ+LLvvA7wxBQE5ddeLU7pJ3FsKFWirDw6veY3s9iLxAQEw7lXGHnhCJvBujEQWuNnGzZcvCvdkLQ==}
 
   concat-map@0.0.1:
     resolution: {integrity: sha512-/Srv4dswyQNBfohGpz9o6Yb3Gz3SrUDqBH5rTuhGR7ahtlbYKnVxw2bCFMRljaA7EXHaXZ8wsHdodFvbkhKmqg==}
@@ -1936,6 +1961,10 @@ packages:
   is-bigint@1.1.0:
     resolution: {integrity: sha512-n4ZT37wG78iz03xPRKJrHTdZbe3IicyucEtdRsV5yglwc3GyUfbAfpSeD0FJ41NbUNSt5wbhqfp1fS+BgnvDFQ==}
     engines: {node: '>= 0.4'}
+
+  is-blob@2.1.0:
+    resolution: {integrity: sha512-SZ/fTft5eUhQM6oF/ZaASFDEdbFVe89Imltn9uZr03wdKMcWNVYSMjQPFtg05QuNkt5l5c135ElvXEQG0rk4tw==}
+    engines: {node: '>=6'}
 
   is-boolean-object@1.2.2:
     resolution: {integrity: sha512-wa56o2/ElJMYqjCjGkXri7it5FbebW5usLw/nPmCMs5DeZ7eziSYZhSmPRn0txqeW4LnAmQQU7FgqLpsEFKM4A==}
@@ -2400,6 +2429,10 @@ packages:
   pretty-bytes@6.1.1:
     resolution: {integrity: sha512-mQUvGU6aUFQ+rNvTIAcZuWGRT9a6f6Yrg9bHs4ImKF+HZCEK+plBvnAZYSIQztknZF2qnzNtr6F8s0+IuptdlQ==}
     engines: {node: ^14.13.1 || >=16.0.0}
+
+  promise-queue@2.2.5:
+    resolution: {integrity: sha512-p/iXrPSVfnqPft24ZdNNLECw/UrtLTpT3jpAAMzl/o5/rDsGCPo3/CQS2611flL6LkoEJ3oQZw7C8Q80ZISXRQ==}
+    engines: {node: '>= 0.8.0'}
 
   prop-types@15.8.1:
     resolution: {integrity: sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==}
@@ -3827,6 +3860,12 @@ snapshots:
   '@unrs/resolver-binding-win32-x64-msvc@1.11.1':
     optional: true
 
+  '@uppy/aws-s3@5.1.0(@uppy/core@5.2.0)':
+    dependencies:
+      '@uppy/companion-client': 5.1.1(@uppy/core@5.2.0)
+      '@uppy/core': 5.2.0
+      '@uppy/utils': 7.1.5
+
   '@uppy/companion-client@5.1.1(@uppy/core@5.2.0)':
     dependencies:
       '@uppy/core': 5.2.0
@@ -3841,6 +3880,15 @@ snapshots:
       dequal: 2.0.3
       preact: 10.28.2
       pretty-bytes: 6.1.1
+
+  '@uppy/compressor@3.1.0(@uppy/core@5.2.0)':
+    dependencies:
+      '@transloadit/prettier-bytes': 0.3.5
+      '@uppy/core': 5.2.0
+      '@uppy/utils': 7.1.5
+      compressorjs: 1.2.1
+      preact: 10.28.2
+      promise-queue: 2.2.5
 
   '@uppy/core@5.2.0':
     dependencies:
@@ -4044,6 +4092,8 @@ snapshots:
 
   baseline-browser-mapping@2.9.11: {}
 
+  blueimp-canvas-to-blob@3.29.0: {}
+
   brace-expansion@1.1.12:
     dependencies:
       balanced-match: 1.0.2
@@ -4104,6 +4154,11 @@ snapshots:
       color-name: 1.1.4
 
   color-name@1.1.4: {}
+
+  compressorjs@1.2.1:
+    dependencies:
+      blueimp-canvas-to-blob: 3.29.0
+      is-blob: 2.1.0
 
   concat-map@0.0.1: {}
 
@@ -4684,6 +4739,8 @@ snapshots:
     dependencies:
       has-bigints: 1.1.0
 
+  is-blob@2.1.0: {}
+
   is-boolean-object@1.2.2:
     dependencies:
       call-bound: 1.0.4
@@ -5110,6 +5167,8 @@ snapshots:
   prelude-ls@1.2.1: {}
 
   pretty-bytes@6.1.1: {}
+
+  promise-queue@2.2.5: {}
 
   prop-types@15.8.1:
     dependencies:

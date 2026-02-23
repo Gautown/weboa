@@ -5,8 +5,8 @@ import { useExtracted } from "next-intl";
 import Uppy from "@uppy/core";
 // 注：由于百度网盘和阿里网盘无官方Uppy支持，使用腾讯云COS和阿里云OSS作为替代
 // 百度网盘和阿里网盘需要自定义OAuth集成，暂不支持直接替换
-import GoogleDrive from "@uppy/google-drive";
-import Dropbox from "@uppy/dropbox";
+import AwsS3 from "@uppy/aws-s3";
+import Compressor from "@uppy/compressor";
 import OneDrive from "@uppy/onedrive";
 import Dashboard from "@uppy/dashboard";
 
@@ -45,23 +45,11 @@ export function CloudProviderButtons({
       },
     });
 
-    // 添加所有云存储插件
+    // 添加基础插件
     try {
-      uppy.use(GoogleDrive, {
-        companionUrl: "https://companion.uppy.io",
-        companionCookiesRule: "same-origin",
-      });
+      uppy.use(Compressor);
     } catch (error) {
-      console.warn("Failed to initialize Google Drive plugin:", error);
-    }
-
-    try {
-      uppy.use(Dropbox, {
-        companionUrl: "https://companion.uppy.io",
-        companionCookiesRule: "same-origin",
-      });
-    } catch (error) {
-      console.warn("Failed to initialize Dropbox plugin:", error);
+      console.warn("Failed to initialize Compressor plugin:", error);
     }
 
     try {
@@ -202,36 +190,36 @@ export function CloudProviderButtons({
         </div>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          {/* Google Drive Button */}
+          {/* 腾讯云 COS Button */}
           <button
-            onClick={() => openProvider('GoogleDrive')}
-            className="flex flex-col items-center justify-center p-6 bg-red-50 hover:bg-red-100 border border-red-200 rounded-lg transition-all group"
+            onClick={() => openProvider('TencentCOS')}
+            className="flex flex-col items-center justify-center p-6 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg transition-all group"
           >
-            <div className="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+            <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
               <svg className="w-6 h-6 text-white" viewBox="0 0 24 24">
                 <path
                   fill="currentColor"
-                  d="M22.5 10.5l-1.2-2.1c-.3-.5-.9-.8-1.5-.8H16l-2.1-3.5c-.3-.5-.9-.8-1.5-.8H8.7c-.6 0-1.2.3-1.5.8L5.1 7.5H2.4c-.6 0-1.2.3-1.5.8L.3 10.5c-.3.5-.3 1.1 0 1.6l.6 2.1c.3.5.9.8 1.5.8h3.7l2.1 3.5c.3.5.9.8 1.5.8h3.7c.6 0 1.2-.3 1.5-.8l2.1-3.5h2.7c.6 0 1.2-.3 1.5-.8l.6-2.1c.3-.5.3-1.1 0-1.6zm-15.2 4l-1.9-3.2 1.9-3.2 1.9 3.2-1.9 3.2zm4.4 0l-1.9-3.2 1.9-3.2 1.9 3.2-1.9 3.2zm4.4 0l-1.9-3.2 1.9-3.2 1.9 3.2-1.9 3.2z"
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
                 />
               </svg>
             </div>
-            <span className="font-medium text-red-700">Google Drive</span>
+            <span className="font-medium text-green-700">{t("Tencent Cloud COS")}</span>
           </button>
 
-          {/* Dropbox Button */}
+          {/* 阿里云 OSS Button */}
           <button
-            onClick={() => openProvider('Dropbox')}
-            className="flex flex-col items-center justify-center p-6 bg-blue-50 hover:bg-blue-100 border border-blue-200 rounded-lg transition-all group"
+            onClick={() => openProvider('AliyunOSS')}
+            className="flex flex-col items-center justify-center p-6 bg-orange-50 hover:bg-orange-100 border border-orange-200 rounded-lg transition-all group"
           >
-            <div className="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+            <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
               <svg className="w-6 h-6 text-white" viewBox="0 0 24 24">
                 <path
                   fill="currentColor"
-                  d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.6 0 12 0zm5.4 15.6l-3.6-2.1 3.6-2.1v4.2zm-10.8 0V11.4l3.6 2.1-3.6 2.1zm5.4-1.2l-3.6-2.1 3.6-2.1 3.6 2.1-3.6 2.1z"
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
                 />
               </svg>
             </div>
-            <span className="font-medium text-blue-700">Dropbox</span>
+            <span className="font-medium text-orange-700">{t("Alibaba Cloud OSS")}</span>
           </button>
 
           {/* OneDrive Button */}
