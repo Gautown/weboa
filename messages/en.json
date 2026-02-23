@@ -63,12 +63,5 @@
   "W2sXxa": "Search for templates (e.g. 'Resume', 'Report', 'Pitch')...",
   "sc2DN9": "Use Template",
   "F03jGl": "No templates found matching your criteria.",
-  "jKKg2o": "Clear all filters",
-  "Cloud Storage Providers": "Cloud Storage Providers",
-  "Select files directly from your preferred cloud storage service": "Select files directly from your preferred cloud storage service",
-  "Tencent Cloud COS": "Tencent Cloud COS",
-  "Alibaba Cloud OSS": "Alibaba Cloud OSS",
-  "OneDrive": "OneDrive",
-  "Select from {provider}": "Select from {provider}",
-  "Select files from your device": "Select files from your device"
+  "jKKg2o": "Clear all filters"
 }

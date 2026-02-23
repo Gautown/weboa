@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useState, useEffect } from "react";
 import {
   Home as HomeIcon,
   Files,
@@ -30,6 +31,11 @@ interface SidebarProps {
 
 export function Sidebar({ pathname, getNewUrl }: SidebarProps) {
   const t = useExtracted();
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
 
   const newDocTypes = [
     {
@@ -58,51 +64,58 @@ export function Sidebar({ pathname, getNewUrl }: SidebarProps) {
 
       {/* New Document Button with Popover */}
       <div className="px-4 mb-2">
-        <Popover>
-          <PopoverTrigger asChild>
-            <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium text-sm shadow-md hover:bg-primary/90 hover:shadow-lg transition-all active:scale-[0.98]">
-              <Plus className="w-5 h-5" />
-              {t("New")}
-            </button>
-          </PopoverTrigger>
-          <PopoverContent
-            side="bottom"
-            align="start"
-            sideOffset={8}
-            className="w-56 p-2 bg-popover border-border"
-          >
-            <div className="space-y-2">
-              {newDocTypes.map(({ type, label }) => {
-                const doc = getDocConfig(type);
-                const Icon = doc.icon;
-                return (
-                  <Link
-                    key={type}
-                    href={getNewUrl ? getNewUrl(type) : "#"}
-                    className={cn(
-                      "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
-                      // Light mode: use doc colors; Dark mode: use custom dark styles
-                      doc.bgColor,
-                      "dark:bg-white/5 dark:hover:bg-white/10 dark:border dark:border-white/5",
-                    )}
-                  >
-                    <Icon
+        {isClient ? (
+          <Popover>
+            <PopoverTrigger asChild>
+              <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium text-sm shadow-md hover:bg-primary/90 hover:shadow-lg transition-all active:scale-[0.98]">
+                <Plus className="w-5 h-5" />
+                {t("New")}
+              </button>
+            </PopoverTrigger>
+            <PopoverContent
+              side="bottom"
+              align="start"
+              sideOffset={8}
+              className="w-56 p-2 bg-popover border-border"
+            >
+              <div className="space-y-2">
+                {newDocTypes.map(({ type, label }) => {
+                  const doc = getDocConfig(type);
+                  const Icon = doc.icon;
+                  return (
+                    <Link
+                      key={type}
+                      href={getNewUrl ? getNewUrl(type) : "#"}
                       className={cn(
-                        "w-5 h-5",
-                        doc.color,
-                        // Ensure icons are vibrant in dark mode
-                        "dark:text-primary dark:filter dark:brightness-125",
+                        "flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-200",
+                        // Light mode: use doc colors; Dark mode: use custom dark styles
+                        doc.bgColor,
+                        "dark:bg-white/5 dark:hover:bg-white/10 dark:border dark:border-white/5",
                       )}
-                    />
-                    <span className="text-sm font-medium text-foreground dark:text-slate-200">
-                      {label}
-                    </span>
-                  </Link>
-                );
-              })}
-            </div>
-          </PopoverContent>
-        </Popover>
+                    >
+                      <Icon
+                        className={cn(
+                          "w-5 h-5",
+                          doc.color,
+                          // Ensure icons are vibrant in dark mode
+                          "dark:text-primary dark:filter dark:brightness-125",
+                        )}
+                      />
+                      <span className="text-sm font-medium text-foreground dark:text-slate-200">
+                        {label}
+                      </span>
+                    </Link>
+                  );
+                })}
+              </div>
+            </PopoverContent>
+          </Popover>
+        ) : (
+          <button className="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium text-sm shadow-md opacity-70 cursor-not-allowed">
+            <Plus className="w-5 h-5" />
+            {t("New")}
+          </button>
+        )}
       </div>
 
       <nav className="flex-1 px-4 py-2 space-y-1">

@@ -17,7 +17,7 @@ const withNextIntl = createNextIntlPlugin({
 
 const nextConfig: NextConfig = {
   /* config options here */
-  output: "export",
+  // 移除 output: "export" 以支持 API 路由
   
   // 禁用源映射以解决 SWC 错误
   productionBrowserSourceMaps: false,

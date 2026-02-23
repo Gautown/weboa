@@ -10,9 +10,9 @@ import Compressor from "@uppy/compressor";
 import OneDrive from "@uppy/onedrive";
 import Dashboard from "@uppy/dashboard";
 // 暂时注释掉有问题的依赖
-// import COS from "cos-js-sdk-v5";
+import COS from "cos-js-sdk-v5";
 // import OSS from "ali-oss";
-// import { cosConfig, allowedFileTypes, uploadConfig } from "@/config/cos.config";
+import { cosConfig, allowedFileTypes, uploadConfig } from "@/config/cos.config";
 // import { aliyunOSSConfig, aliyunAllowedFileTypes, aliyunUploadConfig } from "@/config/aliyun-oss.config";
 
 interface CloudProviderButtonsProps {
@@ -60,17 +60,15 @@ export function CloudProviderButtons({
   const [selectedOneDriveFile, setSelectedOneDriveFile] = useState<string | null>(null);
   
   // 腾讯云 COS 客户端
-  // const [cosClient, setCosClient] = useState<any | null>(null);
+  const [cosClient, setCosClient] = useState<COS | null>(null);
   
   // 阿里云 OSS 客户端
-  // const [ossClient, setOssClient] = useState<any | null>(null);
+  const [ossClient, setOssClient] = useState<any | null>(null);
   
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(() => {
-    // 暂时注释掉 COS 和 OSS 初始化
     // 初始化腾讯云 COS 客户端
-    /*
     const initCOS = () => {
       try {
         const client = new COS(cosConfig);
@@ -81,6 +79,7 @@ export function CloudProviderButtons({
       }
     };
     
+    /*
     // 初始化阿里云 OSS 客户端
     const initOSS = () => {
       try {
@@ -91,10 +90,10 @@ export function CloudProviderButtons({
         console.error('阿里云 OSS 客户端初始化失败:', error);
       }
     };
+    */
     
     initCOS();
-    initOSS();
-    */
+    // initOSS();
     
     // 初始化 Uppy 实例
     const uppy = new Uppy({
@@ -125,7 +124,7 @@ export function CloudProviderButtons({
       width: 750,
       height: 550,
       proudlyDisplayPoweredByUppy: false,
-      note: t("Select files from your device"),
+      note: t("select_files_from_device"),
       doneButtonHandler: null,
     });
 
@@ -142,8 +141,8 @@ export function CloudProviderButtons({
     // 清理函数
     return () => {
       if (uppyRef.current) {
-        // @ts-ignore
-        uppyRef.current.close();
+        uppyRef.current.cancelAll();
+        uppyRef.current.destroy();
       }
     };
   }, [onFileSelect, t]);
@@ -166,7 +165,7 @@ export function CloudProviderButtons({
               width: 750,
               height: 550,
               proudlyDisplayPoweredByUppy: false,
-              note: t("Select files from your device"),
+              note: "Select files from your device",
               doneButtonHandler: null,
             });
           }
@@ -513,28 +512,115 @@ export function CloudProviderButtons({
   };
 
   const handleTencentCOSUpload = () => {
+    if (!cosClient) {
+      alert('COS 客户端未初始化');
+      return;
+    }
+    
+    // 触发文件选择
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.docx,.doc,.xlsx,.xls,.pptx,.ppt,.pdf';
-    input.onchange = (e) => {
+    input.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
-        console.log('上传文件到腾讯云 COS:', file.name);
-        alert(`文件 ${file.name} 已选择`);
+        try {
+          setIsLoading(true);
+          console.log('开始上传文件到腾讯云 COS:', file.name);
+          
+          // 上传文件到 COS
+          await new Promise((resolve, reject) => {
+            cosClient.putObject({
+              Bucket: cosConfig.bucket,
+              Region: cosConfig.region,
+              Key: `uploads/${file.name}`,
+              Body: file,
+              onProgress: function(progressData: any) {
+                console.log('上传进度:', Math.round(progressData.percent * 100) + '%');
+              }
+            }, (err: any, data: any) => {
+              if (err) {
+                reject(err);
+              } else {
+                resolve(data);
+              }
+            });
+          });
+          
+          console.log('文件上传成功:', file.name);
+          alert(`文件 ${file.name} 上传成功！`);
+          
+          // 刷新文件列表
+          await refreshTencentCOS();
+          
+        } catch (error) {
+          console.error('文件上传失败:', error);
+          alert(`文件上传失败: ${(error as Error).message}`);
+        } finally {
+          setIsLoading(false);
+        }
       }
     };
     input.click();
   };
 
-  const handleTencentCOSDownload = () => {
-    if (selectedTencentCOSFile) {
-      console.log('下载文件 from 腾讯云 COS:', selectedTencentCOSFile);
-      alert(`正在下载文件: ${selectedTencentCOSFile}`);
+  const handleTencentCOSDownload = async () => {
+    if (!selectedTencentCOSFile || !cosClient) {
+      alert('请选择要下载的文件');
+      return;
+    }
+    
+    try {
+      setIsLoading(true);
+      
+      // 查找选中的文件
+      const selectedFile = tencentCOSFiles.find(f => f.name === selectedTencentCOSFile);
+      if (!selectedFile) {
+        throw new Error('文件未找到');
+      }
+      
+      // 获取文件的临时访问链接
+      const url = await new Promise<string>((resolve, reject) => {
+        cosClient.getObjectUrl({
+          Bucket: cosConfig.bucket,
+          Region: cosConfig.region,
+          Key: selectedFile.key,
+          Sign: true,
+        }, function(err: any, data: any) {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(data.Url);
+          }
+        });
+      });
+      
+      // 创建临时链接并触发下载
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = selectedFile.name;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      console.log('文件下载完成:', selectedFile.name);
+      alert(`文件 ${selectedFile.name} 开始下载`);
+      
+    } catch (error) {
+      console.error('文件下载失败:', error);
+      alert(`文件下载失败: ${(error as Error).message}`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleTencentCOSSelect = (fileName: string) => {
     setSelectedTencentCOSFile(selectedTencentCOSFile === fileName ? null : fileName);
+    if (selectedTencentCOSFile !== fileName) {
+      console.log('Selected file:', fileName);
+      // 这里可以添加文件预览逻辑
+    }
   };
 
   const renderTencentCOSFileList = () => {
@@ -710,13 +796,6 @@ export function CloudProviderButtons({
   };
 
   const handleAliyunOSSUpload = async () => {
-    /*
-    if (!ossClient) {
-      alert('OSS 客户端未初始化');
-      return;
-    }
-    */
-    
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.docx,.doc,.xlsx,.xls,.pptx,.ppt,.pdf';
@@ -727,15 +806,27 @@ export function CloudProviderButtons({
           setIsLoading(true);
           console.log('开始上传文件到阿里云 OSS:', file.name);
           
-          // 模拟上传文件到 OSS
-          console.log(`模拟上传文件: ${file.name}`);
-          const result = { url: `https://oss.example.com/uploads/${file.name}` };
+          // 创建 FormData
+          const formData = new FormData();
+          formData.append('file', file);
           
-          console.log('文件上传成功:', result);
-          alert(`文件 ${file.name} 上传成功！`);
+          // 调用后端上传 API
+          const response = await fetch('/api/oss/upload', {
+            method: 'POST',
+            body: formData,
+          });
           
-          // 刷新文件列表
-          await handleAliyunOSSDemoLogin();
+          const result = await response.json();
+          
+          if (result.success) {
+            console.log('文件上传成功:', result);
+            alert(`文件 ${file.name} 上传成功！`);
+            
+            // 刷新文件列表
+            await handleAliyunOSSRefresh();
+          } else {
+            throw new Error(result.error || '上传失败');
+          }
           
         } catch (error) {
           console.error('文件上传失败:', error);
@@ -790,7 +881,25 @@ export function CloudProviderButtons({
   };
 
   const handleAliyunOSSRefresh = async () => {
-    await handleAliyunOSSDemoLogin();
+    setIsLoading(true);
+    try {
+      // 调用后端 API 获取文件列表
+      const response = await fetch('/api/oss/list');
+      const data = await response.json();
+      
+      if (data.success) {
+        console.log('阿里云 OSS 文件列表:', data.files);
+        setAliyunOSSFiles(data.files);
+      } else {
+        throw new Error(data.error || '获取文件列表失败');
+      }
+      
+    } catch (error) {
+      console.error('获取阿里云 OSS 文件列表失败:', error);
+      alert(`获取文件列表失败: ${(error as Error).message}`);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleAliyunOSSDelete = async (fileName: string) => {
@@ -1039,10 +1148,10 @@ export function CloudProviderButtons({
     <div className={`space-y-4 ${className}`}>
       <div className="bg-muted/40 dark:bg-white/5 border border-border rounded-lg p-4">
         <h3 className="text-lg font-semibold mb-3">
-          {t("Cloud Storage Providers")}
+          Cloud Storage Providers
         </h3>
         <p className="text-sm text-text-secondary mb-4">
-          {t("Select files directly from your preferred cloud storage service")}
+          Select files directly from your preferred cloud storage service
         </p>
         
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -1059,7 +1168,7 @@ export function CloudProviderButtons({
                 />
               </svg>
             </div>
-            <span className="font-medium text-green-700">{t("Tencent Cloud COS")}</span>
+            <span className="font-medium text-green-700">Tencent Cloud COS</span>
           </button>
 
           {/* 阿里云 OSS Button */}
@@ -1075,7 +1184,7 @@ export function CloudProviderButtons({
                 />
               </svg>
             </div>
-            <span className="font-medium text-orange-700">{t("Alibaba Cloud OSS")}</span>
+            <span className="font-medium text-orange-700">Alibaba Cloud OSS</span>
           </button>
 
           {/* OneDrive Button */}
@@ -1091,7 +1200,7 @@ export function CloudProviderButtons({
                 />
               </svg>
             </div>
-            <span className="font-medium text-teal-700">{t("OneDrive")}</span>
+            <span className="font-medium text-teal-700">OneDrive</span>
           </button>
         </div>
       </div>
@@ -1105,7 +1214,7 @@ export function CloudProviderButtons({
           <div className="bg-background border border-border rounded-2xl shadow-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden">
             <div className="flex items-center justify-between p-4 border-b border-border">
               <h3 className="text-lg font-semibold">
-                {t("Select from {provider}", { provider: activeProvider })}
+                Select from {activeProvider}
               </h3>
               <button
                 onClick={() => setActiveProvider(null)}

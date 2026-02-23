@@ -109,8 +109,7 @@ export function CloudStorageUppy({
     return () => {
       if (uppyRef.current) {
         uppyRef.current.cancelAll();
-        // @ts-ignore
-        uppyRef.current.close?.();
+        uppyRef.current.destroy();
       }
     };
   }, [onFileSelect, onFileSelectWithHandle]);
