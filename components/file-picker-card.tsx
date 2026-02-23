@@ -254,19 +254,12 @@ export function FilePickerCard({
             {t("Supports: DOCX, DOC, XLSX, XLS, PPTX, PPT, PDF")}
           </p>
 
-          {/* Cloud Storage Integration Buttons */}
-          <div className="mt-4 space-y-3">
-            <button
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                setShowCloudModal(true);
-              }}
-              className="flex items-center justify-center gap-2 w-full py-3 bg-gradient-to-r from-purple-500 to-blue-500 text-white rounded-lg hover:from-purple-600 hover:to-blue-600 transition-all font-medium shadow-lg hover:shadow-xl"
-            >
-              <Cloud className="w-5 h-5" />
+          {/* Cloud Storage Section */}
+          <div className="mt-6 pt-4 border-t border-border">
+            <h4 className="text-md font-semibold mb-3 text-foreground flex items-center gap-2">
+              <Cloud className="w-4 h-4 text-primary" />
               {t("Cloud Storage Integration")}
-            </button>
+            </h4>
             
             {/* Direct Provider Buttons */}
             <CloudProviderButtons 
