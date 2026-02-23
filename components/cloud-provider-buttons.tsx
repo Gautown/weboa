@@ -1375,7 +1375,7 @@ export function CloudProviderButtons({
         </div>
       </div>
     );
-  };
+  }
   
   return (
     <div className={`space-y-4 ${className}`}>
@@ -1464,7 +1464,7 @@ export function CloudProviderButtons({
           </div>
         </div>
       )}
-    };
+    }
   
     </div>
   );
