@@ -7,8 +7,6 @@ import GoogleDrive from "@uppy/google-drive";
 import Dropbox from "@uppy/dropbox";
 import OneDrive from "@uppy/onedrive";
 import Dashboard from "@uppy/dashboard";
-import "@uppy/core/dist/style.css";
-import "@uppy/dashboard/dist/style.css";
 
 interface CloudStorageUppyProps {
   onFileSelect?: (file: File) => void;

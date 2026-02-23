@@ -1,6 +1,10 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 
+/* Uppy Styles */
+@import "@uppy/core/css/style.css";
+@import "@uppy/dashboard/css/style.css";
+
 @custom-variant dark (&:is(.dark *));
 
 :root {
