@@ -128,9 +128,7 @@ export function CloudProviderButtons({
               theme: "auto",
               width: "100%",
               height: 400,
-              note: t(
-                "Select files from Google Drive, Dropbox, or OneDrive. Supports: DOCX, DOC, XLSX, XLS, PPTX, PPT, PDF"
-              ),
+              note: t("select_files_from_cloud_storage"),
               proudlyDisplayPoweredByUppy: false,
               showSelectedFiles: true,
               showRemoveButtonAfterComplete: true,
