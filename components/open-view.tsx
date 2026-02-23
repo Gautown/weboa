@@ -143,7 +143,8 @@ export function OpenView({
   ];
 
   return (
-    <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
+    <div className="space-y-10">
+      <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
       <section>
         {/* File Picker Card for uploading files */}
         <FilePickerCard onFileSelectWithHandle={handleFileSelectWithHandle} />
@@ -288,5 +289,6 @@ export function OpenView({
         )}
       </section>
     </div>
-  );
+  </div>
+);
 }
