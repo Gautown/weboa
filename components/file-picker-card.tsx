@@ -4,6 +4,7 @@ import { Upload, FileText, FolderOpen, Download, Cloud } from "lucide-react";
 import { useRef, useState, useEffect } from "react";
 import { useExtracted } from "next-intl";
 import { CloudStorageModal } from "@/components/cloud-storage-modal";
+import { CloudProviderButtons } from "@/components/cloud-provider-buttons";
 
 interface FilePickerCardProps {
   onFileSelect?: (file: File) => void;
@@ -253,8 +254,8 @@ export function FilePickerCard({
             {t("Supports: DOCX, DOC, XLSX, XLS, PPTX, PPT, PDF")}
           </p>
 
-          {/* Cloud Storage Integration Button */}
-          <div className="mt-4">
+          {/* Cloud Storage Integration Buttons */}
+          <div className="mt-4 space-y-3">
             <button
               onClick={(e) => {
                 e.preventDefault();
@@ -266,6 +267,12 @@ export function FilePickerCard({
               <Cloud className="w-5 h-5" />
               {t("Cloud Storage Integration")}
             </button>
+            
+            {/* Direct Provider Buttons */}
+            <CloudProviderButtons 
+              onFileSelect={onFileSelect}
+              onFileSelectWithHandle={onFileSelectWithHandle}
+            />
           </div>
 
           {/* Quick access buttons for File System Access API */}
