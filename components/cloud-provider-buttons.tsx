@@ -1011,6 +1011,9 @@ export function CloudProviderButtons({
           </div>
         );
       case 'OneDrive':
+        if (!isAuthenticated) { // 复用腾讯云的认证状态
+          return renderOneDriveLogin();
+        }
         return (
           <div className="flex flex-col h-full">
             <div className="flex items-center justify-between mb-4 pb-2 border-b border-border">
@@ -1027,15 +1030,24 @@ export function CloudProviderButtons({
                   <h4 className="text-lg font-semibold">OneDrive</h4>
                   <p className="text-sm text-text-secondary">Microsoft 云存储</p>
                 </div>
+                {userInfo && (
+                  <div className="flex items-center gap-2 ml-auto">
+                    <img 
+                      src={userInfo.avatar} 
+                      alt="用户头像" 
+                      className="w-8 h-8 rounded-full"
+                      onError={(e) => (e.currentTarget.src = '/default-avatar.png')}
+                    />
+                    <span className="text-sm">{userInfo.name}</span>
+                  </div>
+                )}
               </div>
               <button
-                onClick={() => refreshOneDrive()}
-                className="p-2 hover:bg-muted rounded-lg transition-colors"
-                title="刷新"
+                onClick={handleOneDriveLogout}
+                className="p-2 hover:bg-muted rounded-lg transition-colors text-sm text-red-500"
+                title="退出登录"
               >
-                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                  <path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/>
-                </svg>
+                退出
               </button>
             </div>
             
