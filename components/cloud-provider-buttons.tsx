@@ -129,23 +129,93 @@ export function CloudProviderButtons({
   const openTencentCOS = () => {
     // 腾讯云 COS 专用逻辑
     console.log("Opening Tencent Cloud COS interface");
-    // 这里可以添加腾讯云 COS 的专门处理逻辑
-    // 比如直接显示文件选择界面或跳转到腾讯云 COS 页面
-    alert(t("Tencent Cloud COS integration is being prepared"));
+    // 直接设置活动提供商为腾讯云 COS，触发内容显示
+    setActiveProvider('TencentCOS');
   };
 
   const openAliyunOSS = () => {
     // 阿里云 OSS 专用逻辑
     console.log("Opening Alibaba Cloud OSS interface");
-    // 这里可以添加阿里云 OSS 的专门处理逻辑
-    alert(t("Alibaba Cloud OSS integration is being prepared"));
+    // 直接设置活动提供商为阿里云 OSS，触发内容显示
+    setActiveProvider('AliyunOSS');
   };
 
   const openOneDrive = () => {
     // OneDrive 专用逻辑
     console.log("Opening OneDrive interface");
-    // 这里可以添加 OneDrive 的专门处理逻辑
-    alert(t("OneDrive integration is being prepared"));
+    // 直接设置活动提供商为 OneDrive，触发内容显示
+    setActiveProvider('OneDrive');
+  };
+
+  const renderProviderContent = (provider: string) => {
+    switch (provider) {
+      case 'TencentCOS':
+        return (
+          <div className="flex flex-col items-center justify-center h-full text-center">
+            <div className="w-16 h-16 bg-green-500 rounded-full flex items-center justify-center mb-4">
+              <svg className="w-8 h-8 text-white" viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+                />
+              </svg>
+            </div>
+            <h4 className="text-xl font-semibold mb-2">腾讯云 COS</h4>
+            <p className="text-text-secondary mb-4">腾讯云对象存储服务</p>
+            <div className="bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg p-4 max-w-md">
+              <p className="text-green-700 dark:text-green-300">
+                腾讯云 COS 集成功能正在开发中，请稍候...
+              </p>
+            </div>
+          </div>
+        );
+      case 'AliyunOSS':
+        return (
+          <div className="flex flex-col items-center justify-center h-full text-center">
+            <div className="w-16 h-16 bg-orange-500 rounded-full flex items-center justify-center mb-4">
+              <svg className="w-8 h-8 text-white" viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+                />
+              </svg>
+            </div>
+            <h4 className="text-xl font-semibold mb-2">阿里云 OSS</h4>
+            <p className="text-text-secondary mb-4">阿里云对象存储服务</p>
+            <div className="bg-orange-50 dark:bg-orange-900/20 border border-orange-200 dark:border-orange-800 rounded-lg p-4 max-w-md">
+              <p className="text-orange-700 dark:text-orange-300">
+                阿里云 OSS 集成功能正在开发中，请稍候...
+              </p>
+            </div>
+          </div>
+        );
+      case 'OneDrive':
+        return (
+          <div className="flex flex-col items-center justify-center h-full text-center">
+            <div className="w-16 h-16 bg-teal-500 rounded-full flex items-center justify-center mb-4">
+              <svg className="w-8 h-8 text-white" viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.6 0 12 0zm5.4 15.6l-3.6-2.1 3.6-2.1v4.2zm-10.8 0V11.4l3.6 2.1-3.6 2.1zm5.4-1.2l-3.6-2.1 3.6-2.1 3.6 2.1-3.6 2.1z"
+                />
+              </svg>
+            </div>
+            <h4 className="text-xl font-semibold mb-2">OneDrive</h4>
+            <p className="text-text-secondary mb-4">Microsoft OneDrive 云存储</p>
+            <div className="bg-teal-50 dark:bg-teal-900/20 border border-teal-200 dark:border-teal-800 rounded-lg p-4 max-w-md">
+              <p className="text-teal-700 dark:text-teal-300">
+                OneDrive 集成功能正在开发中，请稍候...
+              </p>
+            </div>
+          </div>
+        );
+      default:
+        return (
+          <div className="flex flex-col items-center justify-center h-full text-center">
+            <p className="text-text-secondary">请选择一个云存储提供商</p>
+          </div>
+        );
+    }
   };
 
   const openGenericProvider = (provider: string) => {
@@ -282,7 +352,7 @@ export function CloudProviderButtons({
               </button>
             </div>
             <div className="p-4 min-h-[400px]">
-              <div id="uppy-dashboard-container"></div>
+              {renderProviderContent(activeProvider)}
             </div>
           </div>
         </div>
