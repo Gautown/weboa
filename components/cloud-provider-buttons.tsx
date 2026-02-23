@@ -1464,6 +1464,8 @@ export function CloudProviderButtons({
           </div>
         </div>
       )}
+    };
+  
     </div>
   );
 }
