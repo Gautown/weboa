@@ -9,6 +9,8 @@ import AwsS3 from "@uppy/aws-s3";
 import Compressor from "@uppy/compressor";
 import OneDrive from "@uppy/onedrive";
 import Dashboard from "@uppy/dashboard";
+import COS from "cos-js-sdk-v5";
+import { cosConfig, allowedFileTypes, uploadConfig } from "@/config/cos.config";
 
 interface CloudProviderButtonsProps {
   onFileSelect?: (file: File) => void;
@@ -63,8 +65,26 @@ export function CloudProviderButtons({
     { name: 'budget.xlsx', size: 1280000, modified: new Date(), id: '2' },
   ]);
   const [selectedOneDriveFile, setSelectedOneDriveFile] = useState<string | null>(null);
+  
+  // 腾讯云 COS 客户端
+  const [cosClient, setCosClient] = useState<COS | null>(null);
+  
+  // 使用导入的配置
 
   useEffect(() => {
+    // 初始化腾讯云 COS 客户端
+    const initCOS = () => {
+      try {
+        const client = new COS(cosConfig);
+        setCosClient(client);
+        console.log('腾讯云 COS 客户端初始化成功');
+      } catch (error) {
+        console.error('腾讯云 COS 客户端初始化失败:', error);
+      }
+    };
+    
+    initCOS();
+    
     // 初始化 Uppy 实例
     const uppy = new Uppy({
       debug: process.env.NODE_ENV === "development",
@@ -187,37 +207,150 @@ export function CloudProviderButtons({
   };
 
   // 腾讯云 COS 处理函数
-  const refreshTencentCOS = () => {
+  const refreshTencentCOS = async () => {
+    if (!cosClient) {
+      console.error('COS 客户端未初始化');
+      return;
+    }
+    
     setIsLoading(true);
-    // 模拟刷新操作
-    setTimeout(() => {
-      // 这里可以添加真实的腾讯云 COS API 调用
-      console.log('Refreshing Tencent COS files...');
+    try {
+      // 获取文件列表
+      // 注意：需要替换为您的实际 Bucket 和 Region
+      const result = await new Promise((resolve, reject) => {
+        cosClient.getBucket({
+          Bucket: cosConfig.bucket,
+          Region: cosConfig.region,
+          Prefix: '',                 // 文件前缀，可为空
+        }, (err: any, data: any) => {
+          if (err) {
+            reject(err);
+          } else {
+            resolve(data);
+          }
+        });
+      });
+      
+      console.log('腾讯云 COS 文件列表:', result);
+      
+      // 处理返回的文件数据
+      // @ts-ignore
+      const files = result.Contents?.map((item: any) => ({
+        name: item.Key.split('/').pop() || item.Key,
+        size: parseInt(item.Size),
+        modified: new Date(item.LastModified),
+        key: item.Key
+      })) || [];
+      
+      setTencentCOSFiles(files);
+      
+    } catch (error) {
+      console.error('获取腾讯云 COS 文件列表失败:', error);
+      alert('获取文件列表失败，请检查配置');
+    } finally {
       setIsLoading(false);
-    }, 1000);
+    }
   };
 
   const handleTencentCOSUpload = () => {
+    if (!cosClient) {
+      alert('COS 客户端未初始化');
+      return;
+    }
+    
     // 触发文件选择
     const input = document.createElement('input');
     input.type = 'file';
     input.accept = '.docx,.doc,.xlsx,.xls,.pptx,.ppt,.pdf';
-    input.onchange = (e) => {
+    input.onchange = async (e) => {
       const file = (e.target as HTMLInputElement).files?.[0];
       if (file) {
-        console.log('Uploading file to Tencent COS:', file.name);
-        // 这里可以添加真实的上传逻辑
-        alert(`文件 ${file.name} 已选择，上传功能待实现`);
+        try {
+          setIsLoading(true);
+          console.log('开始上传文件到腾讯云 COS:', file.name);
+          
+          // 上传文件到 COS
+          await new Promise((resolve, reject) => {
+            cosClient.putObject({
+              Bucket: cosConfig.bucket,
+              Region: cosConfig.region,
+              Key: `uploads/${file.name}`, // 上传路径
+              Body: file,
+              onProgress: function(progressData: any) {
+                console.log('上传进度:', Math.round(progressData.percent * 100) + '%');
+              }
+            }, (err: any, data: any) => {
+              if (err) {
+                reject(err);
+              } else {
+                resolve(data);
+              }
+            });
+          });
+          
+          console.log('文件上传成功:', file.name);
+          alert(`文件 ${file.name} 上传成功！`);
+          
+          // 刷新文件列表
+          await refreshTencentCOS();
+          
+        } catch (error) {
+          console.error('文件上传失败:', error);
+          alert(`文件上传失败: ${(error as Error).message}`);
+        } finally {
+          setIsLoading(false);
+        }
       }
     };
     input.click();
   };
 
-  const handleTencentCOSDownload = () => {
-    if (selectedTencentCOSFile) {
-      console.log('Downloading file from Tencent COS:', selectedTencentCOSFile);
-      // 这里可以添加真实的下载逻辑
-      alert(`正在下载文件: ${selectedTencentCOSFile}`);
+  const handleTencentCOSDownload = async () => {
+    if (!cosClient || !selectedTencentCOSFile) {
+      alert('请选择要下载的文件');
+      return;
+    }
+    
+    try {
+      setIsLoading(true);
+      console.log('开始下载文件:', selectedTencentCOSFile);
+      
+      // 找到选中的文件信息
+      const selectedFile = tencentCOSFiles.find(f => f.name === selectedTencentCOSFile);
+      if (!selectedFile) {
+        throw new Error('未找到选中的文件');
+      }
+      
+      // 获取文件的临时下载链接
+      const url = cosClient.getObjectUrl({
+        Bucket: cosConfig.bucket,
+        Region: cosConfig.region,
+        Key: selectedFile.key,
+        Sign: true,
+      }, function(err: any, data: any) {
+        if (err) {
+          throw err;
+        }
+        return data.Url;
+      });
+      
+      // 创建临时链接并触发下载
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = selectedFile.name;
+      link.style.display = 'none';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      console.log('文件下载完成:', selectedFile.name);
+      alert(`文件 ${selectedFile.name} 开始下载`);
+      
+    } catch (error) {
+      console.error('文件下载失败:', error);
+      alert(`文件下载失败: ${(error as Error).message}`);
+    } finally {
+      setIsLoading(false);
     }
   };
 
