@@ -1374,7 +1374,70 @@ export function CloudProviderButtons({
           </button>
         </div>
       </div>
-
+    );
+  };
+  
+  return (
+    <div className={`space-y-4 ${className}`}>
+      <div className="bg-muted/40 dark:bg-white/5 border border-border rounded-lg p-4">
+        <h3 className="text-lg font-semibold mb-3">
+          {t("Cloud Storage Providers")}
+        </h3>
+        <p className="text-sm text-text-secondary mb-4">
+          {t("Select files directly from your preferred cloud storage service")}
+        </p>
+            
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          {/* 腾讯云 COS Button */}
+          <button
+            onClick={() => openProvider('TencentCOS')}
+            className="flex flex-col items-center justify-center p-6 bg-green-50 hover:bg-green-100 border border-green-200 rounded-lg transition-all group"
+          >
+            <div className="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <svg className="w-6 h-6 text-white" viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+                />
+              </svg>
+            </div>
+            <span className="font-medium text-green-700">{t("Tencent Cloud COS")}</span>
+          </button>
+  
+          {/* 阿里云 OSS Button */}
+          <button
+            onClick={() => openProvider('AliyunOSS')}
+            className="flex flex-col items-center justify-center p-6 bg-orange-50 hover:bg-orange-100 border border-orange-200 rounded-lg transition-all group"
+          >
+            <div className="w-12 h-12 bg-orange-500 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <svg className="w-6 h-6 text-white" viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"
+                />
+              </svg>
+            </div>
+            <span className="font-medium text-orange-700">{t("Alibaba Cloud OSS")}</span>
+          </button>
+  
+          {/* OneDrive Button */}
+          <button
+            onClick={() => openProvider('OneDrive')}
+            className="flex flex-col items-center justify-center p-6 bg-teal-50 hover:bg-teal-100 border border-teal-200 rounded-lg transition-all group"
+          >
+            <div className="w-12 h-12 bg-teal-500 rounded-full flex items-center justify-center mb-3 group-hover:scale-110 transition-transform">
+              <svg className="w-6 h-6 text-white" viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.6 0 12 0zm5.4 15.6l-3.6-2.1 3.6-2.1v4.2zm-10.8 0V11.4l3.6 2.1-3.6 2.1zm5.4-1.2l-3.6-2.1 3.6-2.1 3.6 2.1-3.6 2.1z"
+                />
+              </svg>
+            </div>
+            <span className="font-medium text-teal-700">{t("OneDrive")}</span>
+          </button>
+        </div>
+      </div>
+  
       {/* 隐藏的触发按钮 */}
       <button className="uppy-Dashboard-open hidden"></button>
       
